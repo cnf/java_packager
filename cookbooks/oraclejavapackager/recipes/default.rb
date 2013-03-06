@@ -46,7 +46,7 @@ bash "fpm DEB package oracle java" do
       --after-install #{pkgprefix}/postinst \
       --before-remove #{pkgprefix}/prerm \
       --vendor "#{node['vendorname']}" -m "#{node['maintainer']}" \
-      --description "Oracle JDK" \
+      --description "Oracle JDK, packaged by #{node['vendorname']}" \
       --url "http://www.oracle.com/technetwork/java/javase/downloads/index.html" \
       --license "Oracle Binary Code License Agreement" \
       opt/
