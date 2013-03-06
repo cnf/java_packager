@@ -12,6 +12,8 @@ Vagrant::Config.run do |config|
     chef.cookbooks_path = [ "cookbooks" ]
     # chef.add_recipe "apt"
     chef.add_recipe "oraclejavapackager"
+    # Java download location:
+    # http://www.oracle.com/technetwork/java/javase/downloads/index.html
     chef.json = {
       'java' => {
         'target' => "1.7.0-17",
