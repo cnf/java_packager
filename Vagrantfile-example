@@ -1,0 +1,24 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant::Config.run do |config|
+  config.vm.box = "precise64"
+  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+  config.vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+  config.vm.customize ["modifyvm", :id, "--memory", 256]
+  config.vm.host_name = "JavaPackageMaker"
+
+  config.vm.provision :chef_solo do |chef|
+    chef.cookbooks_path = [ "cookbooks" ]
+    # chef.add_recipe "apt"
+    chef.add_recipe "oraclejavapackager"
+    chef.json = {
+      'java' => {
+        'target' => "1.7.0-17",
+        'raw' => "jdk-7u17-linux-x64.tar.gz"
+      },
+      'vendorname' => "your name /company here",
+      'maintainer' => "your name / email here"
+    }
+  end
+end

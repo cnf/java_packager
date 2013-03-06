@@ -1,0 +1,64 @@
+#!/bin/sh
+# Shamelessly based on the openJDK ubuntu package scripts
+
+set -e
+
+multiarch=
+priority=1061
+basedir=/opt/jdk<%= node['java']['target'] %>
+mandir=$basedir/man
+srcext=1.gz
+dstext=1.gz
+jdk_tools='appletviewer extcheck idlj jar jarsigner java javac javadoc javafxpackager javah javap javaws jconsole jdb jhat jinfo jmap jps jrunscript jsadebugd jstack jstat jstatd native2ascii rmic schemagen serialver wsgen wsimport xjc'
+
+case "$1" in
+configure)
+    # obsolete tool
+    if update-alternatives --list apt 2>/dev/null; then
+        update-alternatives --remove-all apt || true
+    fi
+
+    if [ -z "$2" ]; then
+        update_alternatives=y
+    fi
+    if [ -n "$multiarch" ] && [ -n "$2" ]; then
+        for i in $jdk_tools; do
+            if [ -z "$(update-alternatives --list $i 2>/dev/null | grep ^$basedir/)" ]; then
+                update_alternatives=y
+                break
+            fi
+        done
+    fi
+
+    if [ "$update_alternatives" = y ]; then
+        if [ -n "$multiarch" ] && [ "$DPKG_MAINTSCRIPT_ARCH" != $(dpkg --print-architecture) ]; then
+            priority=$(expr $priority - 1)
+        fi
+        for i in $jdk_tools; do
+            unset slave1 slave2 || true
+            if [ -e $mandir/man1/$i.$srcext ]; then
+                slave1="--slave \
+                    /usr/share/man/man1/$i.$dstext \
+                    $i.$dstext \
+                    $mandir/man1/$i.$srcext"
+            fi
+            if false && [ -e $mandir/ja/man1/$i.$srcext ]; then
+                slave2="--slave \
+                    /usr/share/man/ja/man1/$i.$dstext \
+                    ${i}_ja.$dstext \
+                    $mandir/ja/man1/$i.$srcext"
+            fi
+            update-alternatives \
+                --install \
+                /usr/bin/$i \
+                $i \
+                $basedir/bin/$i \
+                $priority \
+                $slave1 $slave2 > /dev/null
+        done
+    fi # update alternatives
+
+    ;;
+esac
+
+exit 0

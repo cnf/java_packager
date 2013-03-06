@@ -1,0 +1,14 @@
+#!/bin/sh -e
+# Shamelessly based on the openJDK ubuntu package scripts
+
+jdk_tools='appletviewer extcheck idlj jar jarsigner javac javadoc javah javap jconsole jdb jhat jinfo jmap jps jrunscript jsadebugd jstack jstat jstatd native2ascii rmic schemagen serialver wsgen wsimport xjc'
+basedir=/opt/jdk<%= node['java']['target'] %>
+
+
+if [ "$1" = "remove" ] || [ "$1" = "deconfigure" ]; then
+    for i in $jdk_tools; do
+        update-alternatives --remove $i $basedir/bin/$i
+    done
+fi
+
+
